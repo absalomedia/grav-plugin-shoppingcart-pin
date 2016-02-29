@@ -1,0 +1,55 @@
+name: Shopping Cart Plugin Pin
+version: 1.0.0
+description: "Add Pin checkout to the Grav Shopping Cart Plugin"
+icon: shopping-cart
+author:
+  name: Lawrence Meckan
+  email: media@absalom.biz
+  url: http://www.absalom.biz
+homepage: http://gravshoppingcart.com
+keywords: shoppingcart, ecommerce, e-commerce, plugin, shop, cart, pin
+readme: https://github.com/flaviocopes/grav-plugin-shoppingcart/blob/develop/README.md
+bugs: https://github.com/flaviocopes/grav-plugin-shoppingcart/issues
+license: MIT
+
+form:
+  validation: loose
+  fields:
+    enabled:
+      type: toggle
+      label: PLUGIN_ADMIN.PLUGIN_STATUS
+      highlight: 1
+      default: 0
+      options:
+        1: PLUGIN_ADMIN.ENABLED
+        0: PLUGIN_ADMIN.DISABLED
+      validate:
+        type: bool
+
+    payment.methods.pin.name:
+      type: hidden
+      default: 'Pin'
+
+    payment.methods.pin.description:
+      type: text
+      default: ''
+      label: Payment Description
+      size: medium
+      placeholder: An optional description appearing in the payment popup
+      help: An optional description appearing in the payment popup
+
+    payment.methods.pin.secretKey:
+      type: text
+      default: ''
+      label: Pin API Key
+      size: medium
+      placeholder: The Pin API Key
+      help: The Pin API Key
+
+    payment.methods.pin.testMode:
+      type: text
+      default: 'false'
+      label: Pin Testmode
+      size: medium
+      placeholder: Pin Payment Test Mode
+      help: Pin Payment Test Mode

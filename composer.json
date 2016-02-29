@@ -1,0 +1,14 @@
+{
+    "name": "absalomedia/grav-plugin-shoppingcart-pin",
+    "description": "Pin Payments Plugin for Grav Shopping Cart",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lawrence Meckan",
+            "email": "media@absalom.biz"
+        }
+    ],
+    "require": {
+        "omnipay/pin": "~2.0"
+    }
+}
