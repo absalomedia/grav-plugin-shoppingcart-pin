@@ -6,7 +6,7 @@
     jQuery(function() {
         jQuery(document).on('proceedToPayment', function(event, ShoppingCart) {
 
-            if (ShoppingCart.gateway != 'pin') {
+            if (ShoppingCart.gateway !== 'pin') {
                 return;
             }
 
