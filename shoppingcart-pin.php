@@ -26,6 +26,7 @@ class ShoppingcartPinPlugin extends Plugin
     public function onTwigSiteVariables()
     {
         $this->grav['assets']->addJs('plugin://' . $this->plugin_name . '/gateways/pin/script.js');
+        $this->grav['assets']->addJs('https://cdn.pin.net.au/pin.v2.js');
     }
 
     /**
