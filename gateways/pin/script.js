@@ -18,9 +18,9 @@
                 token: function(token, args) {
                     var order = {
                         products: storejs.get('grav-shoppingcart-basket-data'),
-                        address: storejs.get('grav-shoppingcart-person-address'),
+                        data: storejs.get('grav-shoppingcart-checkout-form-data'),
                         shipping: storejs.get('grav-shoppingcart-shipping-method'),
-                        payment: storejs.get('grav-shoppingcart-payment-method'),
+                        payment: 'pin',
                         token: storejs.get('grav-shoppingcart-order-token').token,
                         extra: { 'pinToken': token.id },
                         amount: ShoppingCart.totalOrderPrice.toString(),
@@ -29,7 +29,7 @@
 
 
                     jQuery.ajax({
-                        url: ShoppingCart.settings.baseURL + ShoppingCart.settings.urls.saveOrderURL + '?task=pay',
+                        url: ShoppingCart.settings.baseURL + ShoppingCart.settings.urls.save_order_url + '/task:pay',
                         data: order,
                         type: 'POST'
                     })
@@ -43,10 +43,10 @@
                 }
             });
 
-            pinHandler.open({
+            stripeHandler.open({
                 name: ShoppingCart.settings.payment.methods.pin.name,
                 description: ShoppingCart.settings.payment.methods.pin.description,
-                email: storejs.get('grav-shoppingcart-person-address').email,
+                email: storejs.get('grav-shoppingcart-checkout-form-data').email,
                 amount: ShoppingCart.calculateTotalPriceIncludingTaxesAndShipping().toString().replace('.', ''),
                 currency: ShoppingCart.settings.general.currency
             });

@@ -12,6 +12,11 @@ readme: https://github.com/flaviocopes/grav-plugin-shoppingcart/blob/develop/REA
 bugs: https://github.com/flaviocopes/grav-plugin-shoppingcart/issues
 license: MIT
 
+testing: true
+
+dependencies:
+  - { name: shoppingcart, version: '~1.1' }
+
 form:
   validation: loose
   fields:
