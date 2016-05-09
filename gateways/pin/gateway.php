@@ -1,15 +1,21 @@
 <?php
-namespace Grav\Plugin;
+namespace Grav\Plugin\ShoppingCart;
 
-use Grav\Common\Plugin;
-use Grav\Common\Grav;
 use RocketTheme\Toolbox\Event\Event;
 use Omnipay\Omnipay;
 
-$path = realpath(__DIR__ . '/../../classes/gateway.php');
-require_once($path);
+/**
+ * Class GatewayPin
+ * @package Grav\Plugin\ShoppingCart
+ */
+class GatewayPin extends Gateway
+{
+    protected $name = 'pin';
 
-class ShoppingCartGatewayPin extends ShoppingCartGateway
+    /**
+     * Handle paying via this gateway
+     *
+     * @param Event $event
 {
     protected $name = 'pin';
 
@@ -18,44 +24,37 @@ class ShoppingCartGatewayPin extends ShoppingCartGateway
      */
     public function onShoppingCartPay(Event $event)
     {
-        if (!$this->isCurrentGateway($event['gateway'])) {
-            return;
-        }
+        if (!$this->isCurrentGateway($event['gateway'])) { return false; }
 
         $order = $this->getOrderFromEvent($event);
 
         $amount = $order->amount;
         $currency = $this->grav['config']->get('plugins.shoppingcart.general.currency');
-        $description = $this->grav['config']->get('plugins.shoppingcart.payment.methods.pin.description');
+        $description = $this->grav['config']->get('plugins.shoppingcart.payment.methods.stripe.description');
 
-        $secretKey = $this->grav['config']->get('plugins.shoppingcart.payment.methods.pin.secretKey');
-        $testMode  = $this->grav['config']->get('plugins.shoppingcart.payment.methods.pin.testMode');
+        $token = $order->extra['pinToken'];
+        $secretKey = $this->grav['config']->get('plugins.shoppingcart.payment.methods.stripe.secretKey');
 
-        $gateway = Omnipay::create('PinGateway');
-
-        $gateway->setSecretKey($secretKey);
-
+        $gateway = Omnipay::create('PinPayments');
+        $gateway->setApiKey($secretKey);
 
         try {
             $response = $gateway->purchase([
                 'amount' => $amount,
                 'currency' => $currency,
                 'description' => $description,
-                'card' => $card,
-                'clientIp' => $_SERVER['REMOTE_ADDR']])->send();
-            if (!$response->isSuccessful() && !$response->isRedirect()) {
-                 // display error to customer
-                throw new \RuntimeException("Payment not successful: " . $response->getMessage());
-            }
+                'token' => $token])->send();
+
             if ($response->isSuccessful()) {
                 // mark order as complete
-                $saleId = $response->getTransactionReference();
-                $this->grav->fireEvent('onShoppingCartSaveOrder', new Event(['gateway' => $this->name, 'order' => $order, 'reference' => $saleId]));
-                $this->grav->fireEvent('onShoppingCartReturnOrderPageUrlForAjax', new Event(['gateway' => $this->name, 'order' => $order, 'reference' => $saleId]));
+                $this->grav->fireEvent('onShoppingCartSaveOrder', new Event(['gateway' => $this->name, 'order' => $order]));
+                $this->grav->fireEvent('onShoppingCartReturnOrderPageUrlForAjax', new Event(['gateway' => $this->name, 'order' => $order]));
             } elseif ($response->isRedirect()) {
                 $response->redirect();
+            } else {
+                // display error to customer
+                throw new \RuntimeException("Payment not successful: " . $response->getMessage());
             }
-               
         } catch (\Exception $e) {
             // internal error, log exception and display a generic message to the customer
             throw new \RuntimeException('Sorry, there was an error processing your payment: ' . $e->getMessage());
