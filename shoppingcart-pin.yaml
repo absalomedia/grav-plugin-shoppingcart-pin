@@ -5,4 +5,3 @@ payment:
             name: 'Pin Payments'
             description: 'Test description' # The description appearing in the payment popup
             secretKey: '' # Add your own secret key
-            testMode: 'true' # Set whether its sandbox or live
