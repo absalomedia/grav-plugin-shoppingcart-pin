@@ -1,16 +1,14 @@
 <?php
 namespace Grav\Plugin;
-
 use Grav\Common\Plugin;
-use Grav\Common\Uri;
-use RocketTheme\Toolbox\Event\Event;
-
+/**
+ * Class ShoppingcartPinPlugin
+ * @package Grav\Plugin
+ */
 class ShoppingcartPinPlugin extends Plugin
 {
     protected $plugin_name = 'shoppingcart-pin';
-
     protected $gateway;
-
     /**
      * @return array
      */
@@ -20,33 +18,35 @@ class ShoppingcartPinPlugin extends Plugin
             'onPluginsInitialized' => ['onPluginsInitialized', 0]
         ];
     }
-
     /**
      */
     public function onTwigSiteVariables()
     {
+        $this->grav['assets']->addJs('plugin://' . $this->plugin_name . '/gateways/stripe/script.js');
         $this->grav['assets']->addJs('https://cdn.pin.net.au/pin.v2.js');
-        $this->grav['assets']->addJs('plugin://' . $this->plugin_name . '/gateways/pin/script.js');
     }
-
+    /**
+     */
+    public function mergeShoppingCartPluginConfig()
+    {
+        $config = $this->config->get('plugins.' . $this->plugin_name);
+        unset($config['enabled']);
+        $this->config->set('plugins.shoppingcart', array_replace_recursive($this->config->get('plugins.shoppingcart'), $config));
+    }
     /**
      * Enable search only if url matches to the configuration.
      */
     public function onPluginsInitialized()
     {
         require_once __DIR__ . '/vendor/autoload.php';
-
-        $this->config->set('plugins.shoppingcart', array_replace_recursive($this->config->get('plugins.shoppingcart'), $this->config->get('plugins.shoppingcart-pin')));
-
         if (!$this->isAdmin()) {
-            // Site
+            $this->mergeShoppingCartPluginConfig();
             $this->enable([
                 'onTwigSiteVariables'          => ['onTwigSiteVariables', 0],
                 'onShoppingCartPay'            => ['onShoppingCartPay', 0],
             ]);
         }
     }
-
     /**
      *
      */
@@ -58,7 +58,6 @@ class ShoppingcartPinPlugin extends Plugin
         }
         require_once($path);
     }
-
     /**
      *
      */
@@ -67,12 +66,10 @@ class ShoppingcartPinPlugin extends Plugin
         if (!$this->gateway) {
             $this->requireGateway();
             require_once __DIR__ . '/gateways/pin/gateway.php';
-            $this->gateway = new ShoppingCartGatewayPin();
+            $this->gateway = new ShoppingCart\GatewayPin();
         }
-
         return $this->gateway;
     }
-
     /**
      * @param $event
      */
